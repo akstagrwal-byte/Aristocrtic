@@ -5,10 +5,12 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from .services import (
+    code_exists,
     consume_hold,
     create_run,
     create_session_token,
     execute_run,
+    generate_ghs_code,
     issue_auth_code,
     refund_hold,
     register_user,
@@ -29,6 +31,10 @@ class RegisterRequest(BaseModel):
 
 
 class VerifyCodeRequest(BaseModel):
+    code: str
+
+
+class VerifyGeneratedCodeRequest(BaseModel):
     code: str
 
 
@@ -99,6 +105,19 @@ def auth_verify(req: VerifyCodeRequest) -> dict:
         raise HTTPException(status_code=400, detail=str(err)) from err
     token = create_session_token(user_id)
     return {"user_id": user_id, "authenticated": True, "access_token": token}
+
+
+@app.post("/codes/generate")
+def codes_generate() -> dict:
+    code = generate_ghs_code()
+    return {"code": code.code, "created_at": code.created_at.isoformat()}
+
+
+@app.post("/codes/verify")
+def codes_verify(req: VerifyGeneratedCodeRequest) -> dict:
+    normalized_code = req.code.strip().upper()
+    exists = code_exists(normalized_code)
+    return {"code": normalized_code, "exists": exists}
 
 
 @app.get("/wallet/me")
