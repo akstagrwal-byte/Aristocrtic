@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GHS Code Verification</title>
+  <link rel="stylesheet" href="/frontend/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>GHS Code Verification Portal</h1>
+    <p>Separate frontend connected to the backend code database.</p>
+    <div class="row">
+      <input id="code-input" placeholder="GHS-0000" />
+      <button id="verify-btn">Verify code</button>
+    </div>
+    <div id="result" class="result"></div>
+    <div id="action-log" class="action-log"></div>
+  </main>
+  <script src="/frontend/app.js"></script>
+</body>
+</html>

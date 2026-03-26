@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from .services import (
@@ -25,6 +28,8 @@ from .store import store
 
 app = FastAPI(title="Aristocrtic GHS Backend", version="0.2.0")
 security = HTTPBearer(auto_error=False)
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 
 class RegisterRequest(BaseModel):
@@ -80,66 +85,9 @@ def health() -> dict:
     return {"ok": True}
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=FileResponse)
 def verification_portal() -> str:
-    return """
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GHS Code Verification</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
-    input, button { padding: .6rem; font-size: 1rem; }
-    #result { margin-top: 1rem; font-weight: 600; }
-    #action-log { margin-top: .8rem; color: #0b57d0; white-space: pre-line; }
-  </style>
-</head>
-<body>
-  <h1>GHS Code Verification Portal</h1>
-  <p>This website is connected to the backend store and can verify if a code exists.</p>
-  <input id="code-input" placeholder="GHS-0000" />
-  <button id="verify-btn">Verify code</button>
-  <div id="result"></div>
-  <div id="action-log"></div>
-
-  <script>
-    const btn = document.getElementById("verify-btn");
-    const result = document.getElementById("result");
-    const actionLog = document.getElementById("action-log");
-    const input = document.getElementById("code-input");
-
-    function runSpecificActionScript(code) {
-      document.body.style.background = "#f4f8ff";
-      actionLog.textContent =
-        `Specific script executed for ${code}:\n` +
-        "- Session action token prepared\n" +
-        "- Follow-up automation step triggered\n" +
-        "- Audit log marker recorded";
-    }
-
-    btn.addEventListener("click", async () => {
-      const code = (input.value || "").trim().toUpperCase();
-      if (!code) {
-        result.textContent = "Enter a code first.";
-        return;
-      }
-
-      const res = await fetch(`/codes/verify/${encodeURIComponent(code)}`);
-      const payload = await res.json();
-      result.textContent = payload.message;
-
-      if (payload.exists) {
-        runSpecificActionScript(payload.code);
-      } else {
-        actionLog.textContent = "No action script executed because code does not exist.";
-      }
-    });
-  </script>
-</body>
-</html>
-"""
+    return str(FRONTEND_DIR / "index.html")
 
 
 @app.post("/testing/reset")

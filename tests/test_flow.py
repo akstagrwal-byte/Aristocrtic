@@ -114,3 +114,11 @@ def test_generated_code_can_be_verified_via_api():
     assert verify_miss.status_code == 200
     assert verify_miss.json()["exists"] is False
     assert verify_miss.json()["message"] == "Code does not exist"
+
+
+def test_separate_frontend_is_served():
+    client = TestClient(app)
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "GHS Code Verification Portal" in response.text
+    assert "/frontend/app.js" in response.text
