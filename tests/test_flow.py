@@ -90,3 +90,20 @@ def test_hold_refunded_on_failure_via_api():
     wallet = client.get("/wallet/me", headers=auth_headers(token)).json()
     assert wallet["available_credits"] == 10
     assert wallet["locked_credits"] == 0
+
+
+def test_generated_code_can_be_verified_via_api():
+    client = TestClient(app)
+    client.post("/testing/reset")
+
+    generated = client.post("/codes/generate").json()
+    code = generated["code"]
+
+    assert code.startswith("GHS-")
+    assert len(code) == 8
+
+    verified = client.post("/codes/verify", json={"code": code.lower()}).json()
+    assert verified == {"code": code, "exists": True}
+
+    missing = client.post("/codes/verify", json={"code": "GHS-9999"}).json()
+    assert missing["exists"] is False

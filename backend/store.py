@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from .models import AuthCode, Referral, Run, User, Wallet, WalletHold
+from .models import AuthCode, GeneratedCode, Referral, Run, User, Wallet, WalletHold
 
 
 @dataclass
@@ -16,6 +16,7 @@ class InMemoryStore:
     runs: Dict[str, Run] = field(default_factory=dict)
     referrals: List[Referral] = field(default_factory=list)
     sessions: Dict[str, str] = field(default_factory=dict)  # token -> user_id
+    generated_codes: Dict[str, GeneratedCode] = field(default_factory=dict)
 
     def reset(self) -> None:
         self.users.clear()
@@ -26,6 +27,7 @@ class InMemoryStore:
         self.runs.clear()
         self.referrals.clear()
         self.sessions.clear()
+        self.generated_codes.clear()
 
 
 store = InMemoryStore()

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from random import randint
 from secrets import token_urlsafe
 
 from .models import (
     AuthCode,
+    GeneratedCode,
     Referral,
     Run,
     RunStatus,
@@ -161,3 +163,17 @@ def wallet_snapshot(user_id: str) -> dict:
         "locked_credits": wallet.locked_credits,
         "run_cost": RUN_COST,
     }
+
+
+def generate_ghs_code() -> GeneratedCode:
+    """Create and persist a unique GHS code in GHS-XXXX format."""
+    while True:
+        code = f"GHS-{randint(0, 9999):04d}"
+        if code not in store.generated_codes:
+            record = GeneratedCode(code=code)
+            store.generated_codes[code] = record
+            return record
+
+
+def code_exists(code: str) -> bool:
+    return code.strip().upper() in store.generated_codes
