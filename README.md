@@ -14,6 +14,7 @@ Production-style scaffold for a **Tampermonkey + FastAPI** automation platform w
 - `backend/services.py`: business logic (auth, wallet, runs, referrals)
 - `backend/store.py`: in-memory persistence (users, sessions, runs, holds)
 - code verification API endpoints: `POST /codes/generate`, `GET /codes/verify/{code}`, `GET /codes`
+- verification website: `GET /` (runs a browser-side script when a code exists)
 - `tampermonkey/ghs.user.js`: client runtime (onboard + run flow)
 - `tests/test_flow.py`: API-level integration tests proving connectivity
 

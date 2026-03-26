@@ -104,8 +104,13 @@ def test_generated_code_can_be_verified_via_api():
 
     verify_hit = client.get(f"/codes/verify/{code}")
     assert verify_hit.status_code == 200
-    assert verify_hit.json() == {"code": code, "exists": True}
+    assert verify_hit.json() == {
+        "code": code,
+        "exists": True,
+        "message": "Code exist , test complete and add a specific and certain script to do some actions",
+    }
 
     verify_miss = client.get("/codes/verify/GHS-9999")
     assert verify_miss.status_code == 200
     assert verify_miss.json()["exists"] is False
+    assert verify_miss.json()["message"] == "Code does not exist"
