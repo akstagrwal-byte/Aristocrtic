@@ -2,6 +2,7 @@
 
 Production-style scaffold for a **Tampermonkey + FastAPI** automation platform with connected modules:
 - bot-style onboarding with one-time login code
+- Telegram inline-keyboard bot that generates `GHS-XXXX` codes
 - bearer-token auth session
 - wallet credit gating with hold / consume / refund
 - referral bonuses
@@ -12,6 +13,7 @@ Production-style scaffold for a **Tampermonkey + FastAPI** automation platform w
 - `backend/main.py`: API contracts and auth-protected endpoints
 - `backend/services.py`: business logic (auth, wallet, runs, referrals)
 - `backend/store.py`: in-memory persistence (users, sessions, runs, holds)
+- code verification API endpoints: `POST /codes/generate`, `GET /codes/verify/{code}`, `GET /codes`
 - `tampermonkey/ghs.user.js`: client runtime (onboard + run flow)
 - `tests/test_flow.py`: API-level integration tests proving connectivity
 

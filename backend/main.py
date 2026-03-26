@@ -5,11 +5,14 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from .services import (
+    code_exists,
     consume_hold,
     create_run,
     create_session_token,
     execute_run,
+    generate_ghs_code,
     issue_auth_code,
+    list_generated_codes,
     refund_hold,
     register_user,
     reserve_credits,
@@ -47,6 +50,16 @@ class RunExecuteRequest(BaseModel):
     city: str
     hold_id: str
     simulate_failure: bool = False
+
+
+class CodeGenerateResponse(BaseModel):
+    code: str
+    created_at: str
+
+
+class CodeVerifyResponse(BaseModel):
+    code: str
+    exists: bool
 
 
 def current_user_id(
@@ -145,4 +158,26 @@ def run_execute(req: RunExecuteRequest, user_id: str = Depends(current_user_id))
         "status": run.status,
         "college": run.college,
         "error": run.error,
+    }
+
+
+@app.post("/codes/generate", response_model=CodeGenerateResponse)
+def generate_code() -> dict:
+    generated = generate_ghs_code()
+    return {"code": generated.code, "created_at": generated.created_at.isoformat()}
+
+
+@app.get("/codes/verify/{code}", response_model=CodeVerifyResponse)
+def verify_code_exists(code: str) -> dict:
+    normalized = code.upper()
+    return {"code": normalized, "exists": code_exists(normalized)}
+
+
+@app.get("/codes")
+def list_codes() -> dict:
+    return {
+        "codes": [
+            {"code": code.code, "created_at": code.created_at.isoformat()}
+            for code in list_generated_codes()
+        ]
     }

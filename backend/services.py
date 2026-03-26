@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from secrets import token_urlsafe
+from secrets import randbelow, token_urlsafe
 
 from .models import (
     AuthCode,
+    GeneratedCode,
     Referral,
     Run,
     RunStatus,
@@ -161,3 +162,20 @@ def wallet_snapshot(user_id: str) -> dict:
         "locked_credits": wallet.locked_credits,
         "run_cost": RUN_COST,
     }
+
+
+def generate_ghs_code() -> GeneratedCode:
+    while True:
+        code = f"GHS-{randbelow(10_000):04d}"
+        if code not in store.generated_codes:
+            generated = GeneratedCode(code=code)
+            store.generated_codes[code] = generated
+            return generated
+
+
+def code_exists(code: str) -> bool:
+    return code in store.generated_codes
+
+
+def list_generated_codes() -> list[GeneratedCode]:
+    return sorted(store.generated_codes.values(), key=lambda item: item.created_at, reverse=True)

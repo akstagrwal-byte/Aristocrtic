@@ -75,6 +75,12 @@ class Referral:
     rewarded: bool = False
 
 
+@dataclass
+class GeneratedCode:
+    code: str
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+
 def make_user_id() -> str:
     return f"usr_{uuid4().hex[:10]}"
 
